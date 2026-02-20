@@ -16,7 +16,6 @@ app.use(cors(corsOptions))
 app.use(express.json());
 
 app.use("/leads", leadsRoutes);
-app.use("/leads", leadsRoutes);
 
 const PORT = 3000;
 

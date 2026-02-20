@@ -101,4 +101,64 @@ router.get("/", async (req, res) => {
     }
 })
 
+// Update Route = For update lead's data in DB
+
+async function updateLeadData(leadId, dataToUpdate) {
+    try {
+        const leadDataToUpdate = await Leads.findByIdAndUpdate(leadId, dataToUpdate, { new: true, runValidators: true })
+
+        return leadDataToUpdate;
+    } catch (error) {
+        console.log("Error occurred while updating all the data", error);
+        throw error;
+    }
+}
+
+router.put("/:leadId", async (req, res) => {
+    try {
+        const { leadId } = req.params;
+
+
+        if (!mongoose.Types.ObjectId.isValid(leadId)) {
+            return res.status(400).json({ error: `Invalid Lead Id ${leadId}` })
+        }
+
+        const leadUpdatedData = await updateLeadData(leadId, req.body);
+
+        if (!leadUpdatedData) {
+            res.status(404).json({ error: `Lead with ID ${leadId} not found` })
+        }
+
+        res.status(200).json({ message: "Lead's data updated successfully", lead: leadUpdatedData })
+
+    } catch (error) {
+        res.status(500).json({ error: "Failed to update the data" })
+    }
+})
+
+async function deleteLeadData(leadIdForDelete) {
+    try {
+        const deleteLeadData = await Leads.findByIdAndDelete(leadIdForDelete);
+
+        return deleteLeadData;
+    } catch (error) {
+        console.log("Error occurred while deleting the lead data", error);
+        throw error;
+    }
+}
+
+router.delete("/:leadIdForDelete", async (req, res) => {
+    try {
+        const deteledLeadData = await deleteLeadData(req.params.leadIdForDelete);
+
+        if (deleteLeadData) {
+            res.status(200).json({ message: "Lead's data deleted successfully", lead: deteledLeadData });
+        } else {
+            res.status(404).json({ error: "Failed to delete recipe data" })
+        }
+    } catch (error) {
+        res.status(500).json({ error: "Failed to delete the Lead's data." })
+    }
+})
+
 module.exports = router;
